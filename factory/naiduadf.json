@@ -1,0 +1,9 @@
+{
+	"name": "naiduadf",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3832aa23-5c1d-470a-9735-76d04f4fc1ff",
+		"tenantId": "ca57171a-2855-4587-b25e-6dbd69683e07"
+	}
+}
