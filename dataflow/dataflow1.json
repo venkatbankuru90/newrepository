@@ -30,7 +30,7 @@
 			],
 			"transformations": [
 				{
-					"name": "findingunmatchedrecords"
+					"name": "findingnotmatchedrecords"
 				},
 				{
 					"name": "ConditionalSplit1"
@@ -42,7 +42,7 @@
 					"name": "Select1"
 				}
 			],
-			"script": "source(output(\n\t\tproductid as integer,\n\t\tproductname as string,\n\t\tmodifieddate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceproduct\nsource(output(\n\t\tproductkey as integer,\n\t\tproductid as integer,\n\t\tproductname as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> targetdimproduct\nsourceproduct, targetdimproduct lookup(sourceproduct@productid == targetdimproduct@productid,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> findingunmatchedrecords\nfindingunmatchedrecords split(isMatch(),\n\tdisjoint: false) ~> ConditionalSplit1@(match, unmatched)\nConditionalSplit1@unmatched keyGenerate(output(surrogatekeycoloumn as long),\n\tstartAt: 1L) ~> SurrogateKey1\nConditionalSplit1@unmatched select(mapColumn(\n\t\tproductid = ConditionalSplit1@unmatched@productid,\n\t\tproductname = ConditionalSplit1@unmatched@productname\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSurrogateKey1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tproductkey as integer,\n\t\tproductid as integer,\n\t\tproductname as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tproductkey = surrogatekeycoloumn,\n\t\tproductid = ConditionalSplit1@unmatched@productid,\n\t\tproductname = ConditionalSplit1@unmatched@productname\n\t)) ~> sink1"
+			"script": "source(output(\n\t\tproductid as integer,\n\t\tproductname as string,\n\t\tmodifieddate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceproduct\nsource(output(\n\t\tproductkey as integer,\n\t\tproductid as integer,\n\t\tproductname as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> targetdimproduct\nsourceproduct, targetdimproduct lookup(sourceproduct@productid == targetdimproduct@productid,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> findingnotmatchedrecords\nfindingnotmatchedrecords split(isMatch(),\n\tdisjoint: false) ~> ConditionalSplit1@(match, unmatched)\nSelect1 keyGenerate(output(surrogatekeycoloumn as long),\n\tstartAt: 1L) ~> SurrogateKey1\nConditionalSplit1@unmatched select(mapColumn(\n\t\tproductid = ConditionalSplit1@unmatched@productid,\n\t\tproductname = ConditionalSplit1@unmatched@productname\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSurrogateKey1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tproductkey as integer,\n\t\tproductid as integer,\n\t\tproductname as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 		}
 	}
 }
